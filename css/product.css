@@ -1,0 +1,37 @@
+/* Add this CSS to your main.css file */
+
+/* Style for the heading container */
+.heading-container {
+    text-align: center; /* Center align the heading */
+    margin-bottom: 20px; /* Add some space below the heading */
+  }
+  
+  /* Style for the container */
+  .container {
+    max-width: 900px; /* Set maximum width for better readability */
+    margin: 0 auto; /* Center the container horizontally */
+    padding: 20px; /* Add some padding */
+  }
+  .container h1{
+    text-align: center;
+  }
+  
+  /* Style for user-info container */
+  .user-info {
+    background-color: #fff; /* White background */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Add padding */
+    margin-bottom: 20px; /* Add space at the bottom */
+  }
+  
+  /* Style for table heading */
+  h2 {
+    text-align: center; /* Center align the heading */
+    margin-bottom: 20px; /* Add some space below the heading */
+  }
+  
+  /* Style for action buttons container */
+  .text-center {
+    margin-top: 20px; /* Add space at the top */
+  }
+  

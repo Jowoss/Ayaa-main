@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .quantity-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .quantity-buttons button {
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            margin: 0;
+            font-size: 16px;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Inventory Management System</h1>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer ID</th>
+                <th>Product ID</th>
+                <th>Product Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Sample data for demonstration purposes -->
+            <tr>
+                <td>1</td>
+                <td>101</td>
+                <td class="quantity-buttons">
+                    <button onclick="decrementQuantity(this)">-</button>
+                    <span>201</span>
+                    <button onclick="incrementQuantity(this)">+</button>
+                </td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>102</td>
+                <td class="quantity-buttons">
+                    <button onclick="decrementQuantity(this)">-</button>
+                    <span>202</span>
+                    <button onclick="incrementQuantity(this)">+</button>
+                </td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>103</td>
+                <td class="quantity-buttons">
+                    <button onclick="decrementQuantity(this)">-</button>
+                    <span>203</span>
+                    <button onclick="incrementQuantity(this)">+</button>
+                </td>
+                <td>2</td>
+            </tr>
+        </tbody>
+    </table>
+    <footer>
+        <p>&copy; 2024 Inventory Management System. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        function incrementQuantity(button) {
+            var span = button.parentNode.querySelector("span");
+            var quantity = parseInt(span.innerText);
+            span.innerText = quantity + 1;
+        }
+
+        function decrementQuantity(button) {
+            var span = button.parentNode.querySelector("span");
+            var quantity = parseInt(span.innerText);
+            if (quantity > 0) {
+                span.innerText = quantity - 1;
+            }
+        }
+    </script>
+</body>
+</html>
