@@ -41,6 +41,8 @@ $con = new database();
                         <th>ID</th>
                         <th>Product Name</th>
                         <th>Product Quantity</th>
+                        <th>Date and Time</th>
+                        <th>Total Amount</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -54,6 +56,8 @@ $con = new database();
                         <td><?php echo $counter++;?></td>
                         <td><?php echo $row['product_name'];?></td>
                         <td><?php echo $row['product_quantity'];?></td>
+                        <td><?php echo $row['date_purchased'];?></td>
+                        <td><?php echo $row['payment_totalamount'];?></td>
                         <td>
                         <form action="updateproduct.php" method="POST" style="display: inline;">
                             <input type="hidden" name="id" value="<?php echo $row['purchased_id']; ?>">

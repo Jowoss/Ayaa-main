@@ -201,8 +201,9 @@ function addProduct($name, $type, $stock, $price, $expiration, $picture)
 }
 function getPurchasedData() {
     $con = $this->opencon();
-    $result = $con->query("SELECT purchased.purchased_id, product.name AS product_name, purchased.product_quantity
-                           FROM purchased
+    $result = $con->query("SELECT purchased.purchased_id, product.name AS product_name, purchased.product_quantity, payment.date_purchase, payment.payment_totalamount  
+                           FROM payment
+                           INNER JOIN purchased ON payment.purchased_id = purchased.purchased_id
                            INNER JOIN product ON purchased.product_id = product.product_id");
     if ($result) {
         return $result->fetchAll();
