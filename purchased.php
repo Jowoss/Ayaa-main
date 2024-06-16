@@ -1,19 +1,20 @@
 <?php
 require_once('classes/database.php');
 $con = new database();
- 
-    // Proceed with your database operations
-    if(isset($_POST['product'])) {
-        $product_id = $_POST['id'];
-        if($con->deletePro($product_id)) {
-            header('location:product.php');
-        } else {
-            echo 'Error: Unable to delete product.';
-        }
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+if (isset($_POST['product'])) {
+    $product_id = $_POST['id'];
+    if ($con->deletePro($product_id)) {
+        header('location:product.php');
+    } else {
+        echo 'Error: Unable to delete product.';
     }
+}
 ?>
- 
- 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,9 +26,9 @@ $con = new database();
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="./css/product.css">
 </head>
- 
+
 <body>
- 
+
 <?php include('user_navbar.php');?>
 <?php include('sidebar.php');?>
 <div class="container">
@@ -41,34 +42,35 @@ $con = new database();
                         <th>ID</th>
                         <th>Product Name</th>
                         <th>Product Quantity</th>
-                        <th>Date and Time</th>
+                        <th>Date</th>
                         <th>Total Amount</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php
-                    $counter = 1;
                     $data = $con->getPurchasedData();
-                    foreach($data as $row) {
-                ?>
-                    <tr>
-                        <td><?php echo $counter++;?></td>
-                        <td><?php echo $row['product_name'];?></td>
-                        <td><?php echo $row['product_quantity'];?></td>
-                        <td><?php echo $row['date_purchased'];?></td>
-                        <td><?php echo $row['payment_totalamount'];?></td>
-                        <td>
-                        <form action="updateproduct.php" method="POST" style="display: inline;">
-                            <input type="hidden" name="id" value="<?php echo $row['purchased_id']; ?>">
-                            <button type="submit" name="edit" class="btn btn-primary btn-sm">Edit</button>
-                        </form>
-                        <form method="POST" style="display: inline;">
-                            <input type="hidden" name="id" value="<?php echo $row['purchased_id']; ?>">
-                            <input type="submit" name="product" value="Delete" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?')">
-                        </form>
-                        </td>
-                    </tr>
+                    $currentPaymentId = null; // Track current payment_id
+                    $counter = 1; // Initialize counter
+                    foreach ($data as $row) {
+                        // Check if new payment_id group is starting
+                        if ($row['payment_id'] !== $currentPaymentId) {
+                            // Display a row for the new payment group
+                            echo "<tr>";
+                            echo "<td colspan='4' class='text-left'><strong>Payment ID: {$row['payment_id']}</strong></td>";
+                            echo "<td colspan='4' class='text-left-right'><strong>  ₱ {$row['payment_totalamount']}</strong></td>"; // Display total amount in the same row
+                            echo "</tr>";
+                            $currentPaymentId = $row['payment_id'];
+                            $counter = 1; // Reset the counter for the new group
+                        }
+                        // Display each purchased item within the current payment group
+                        ?>
+                        <tr>
+                            <td><?php echo $counter++;?></td>
+                            <td><?php echo htmlspecialchars($row['product_name']);?></td>
+                            <td><?php echo htmlspecialchars($row['product_quantity']);?></td>
+                            <td><?php echo htmlspecialchars($row['date_purchase']??'');?></td>
+                            <td></td> <!-- Add any additional columns here if needed -->
+                        </tr>
                 <?php
                     }
                 ?>
@@ -81,12 +83,13 @@ $con = new database();
         </div>
     </div>
 </div>
- 
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
- 
+
 </body>
 </html>
+

@@ -20,7 +20,6 @@ if(isset($_POST['del'])){
 
 
 ?>
- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,10 +34,8 @@ if(isset($_POST['del'])){
   <link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
-
 <?php include('user_navbar.php');?>
 <?php include('sidebar.php');?>
-
 <div class="container user-info rounded shadow p-3 my-2">
 <h2 class="text-center mb-2">Admin Table</h2>
   <div class="table-responsive text-center">

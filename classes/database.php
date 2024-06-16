@@ -5,20 +5,40 @@ class database
     {
         return new PDO('mysql:host=localhost;dbname=finals','root','');
     }
-    function check($username,$password){
+    function check($username, $password) {
+        // Open database connection
         $con = $this->opencon();
-        $query = "SELECT * from admin WHERE user='".$username. "'&&pass='".$password."'";
-        return $con->query($query)->fetch();
+    
+        // Prepare the SQL query
+        $query = $con->prepare("SELECT * FROM admin WHERE user = ?");
+        $query->execute([$username]);
+    
+        // Fetch the user data as an associative array
+        $user = $query->fetch(PDO::FETCH_ASSOC);
+    
+        // If a user is found, verify the password
+        if ($user && password_verify($password, $user['pass'])) {
+            return $user;
+        }
+    
+        // If no user is found or password is incorrect, return false
+        return false;
     }
     
     
-    function signupUser($firstname, $lastname, $username, $password,$profilePicture)
+    function signupUser($firstname, $lastname, $username, $password, $profilePicture)
     {
         $con = $this->opencon();
-        // Save user data along with profile picture path to the database
-        $con->prepare("INSERT INTO admin (firstname,lastname, user, pass, profile_picture) VALUES (?,?,?,?,?)")->execute([$firstname, $lastname, $username, $password,$profilePicture]);
+        
+        // Prepare the SQL statement with placeholders
+        $stmt = $con->prepare("INSERT INTO admin (firstname, lastname, user, pass, profile_picture) VALUES (?, ?, ?, ?, ?)");
+        
+        // Bind parameters to the placeholders and execute the statement
+        $stmt->execute([$firstname, $lastname, $username, $password, $profilePicture]);
+        
+        // Return the last inserted ID
         return $con->lastInsertId();
-        }
+    }
 
     function view() {
             $con = $this->opencon();
@@ -151,6 +171,9 @@ function addProduct($name, $type, $stock, $price, $expiration, $picture)
                 return false;
             }
             }
+
+            
+            
             //function updateProduct($name, $stock, $price,$expiration) {
              //   try {
                 //    $con = $this->opencon();
@@ -199,18 +222,31 @@ function addProduct($name, $type, $stock, $price, $expiration, $picture)
         return; // Return false if an error occurs during the update
     }
 }
-function getPurchasedData() {
+public function getPurchasedData() {
     $con = $this->opencon();
-    $result = $con->query("SELECT purchased.purchased_id, product.name AS product_name, purchased.product_quantity, payment.date_purchase, payment.payment_totalamount  
-                           FROM payment
-                           INNER JOIN purchased ON payment.purchased_id = purchased.purchased_id
-                           INNER JOIN product ON purchased.product_id = product.product_id");
+
+    $query = "SELECT payment.payment_id,
+                     product.name AS product_name, 
+                     purchased.product_quantity, 
+                     payment.date_purchase, 
+                     payment.payment_totalamount  
+              FROM payment
+              INNER JOIN purchased ON payment.payment_id = purchased.payment_id
+              INNER JOIN product ON purchased.product_id = product.product_id
+              ORDER BY payment.payment_id DESC"; // Order by payment_id to group by payment
+
+    $result = $con->query($query);
+
     if ($result) {
-        return $result->fetchAll();
+        return $result->fetchAll(PDO::FETCH_ASSOC);
     } else {
         return [];
     }
 }
+
+
+
+
 
 function fetchAvailableProduct() {
     try {
@@ -234,34 +270,65 @@ function fetchSelectedProducts($selectedProductIds) {
     } catch (PDOException $e) {
         // Handle the exception (e.g., log error, return false, etc.)
         return [];
+        }
     }
-}
-  
+   
+    function getTotalSales(){
+        try {
+            $con = $this->opencon();
+            $query = $con->prepare("SELECT SUM(payment_totalamount) AS TotalSales FROM payment");
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            return $result['TotalSales']; // Return the total sales amount
+        } catch (PDOException $e) {
+            // Handle the exception (e.g., log error, return false, etc.)
+            return 0; // Return 0 or handle as needed
+        }
+    }
 
-//         function signupCustomer($firstname, $lastname, $contact,$profilePicture)
-//     {
-//         $con = $this->opencon();
-//         // Save user data along with profile picture path to the database
-//         $con->prepare("INSERT INTO customer (firstname,lastname, contact_number, profile_pic) VALUES (?,?,?,?)")->execute([$firstname, $lastname, $contact,$profilePicture]);
-//         return $con->lastInsertId();
-//         }
-//         function customer() {
-//             $con = $this->opencon();
-//     return $con->query("SELECT customer.customer_id, customer.firstname, customer.lastname, customer.contact_number, customer.profile_pic from customer")->fetchAll();
-// }
-//         function deleteCust($customer_id){
-//             try{
-//                 $con = $this->opencon();
-//                     $con->beginTransaction();
-            
-//                     $query2 = $con->prepare("DELETE FROM customer WHERE customer_id = ?");
-//                     $query2->execute([$customer_id]);
-            
-//                     $con->commit();
-//                     return true;
-//             } catch (PDOException $e){
-//                 $con->rollBack();
-//                 return false;
-//             }
-//             }
+    function getMonthlyIncome(){
+        try {
+            $con = $this->opencon();
+            $query = $con->prepare("SELECT MONTH(date_purchase) AS Month, SUM(payment_totalamount) AS TotalSalesoftheMonth FROM payment GROUP BY MONTH(date_purchase)");
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            return $result['TotalSalesoftheMonth']; // Return the total sales amount
+        } catch (PDOException $e) {
+            // Handle the exception (e.g., log error, return false, etc.)
+            return 0; // Return 0 or handle as needed
+        }
+        
+    }
+
+    function getTotalCustomers(){
+        // Implement this method to fetch total customers if needed
+    }
+
+    function getSalesPerformanceData() {
+        try {
+            $con = $this->opencon();
+            $query = ("SELECT date_purchase, payment_totalamount FROM payment ORDER BY date_purchase DESC");
+            $result = $con->query($query);
+            return $result->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return []; // Return an empty array in case of error
+        }
+    }
+
+    function getmostboughtproduct(){
+        try {
+            $con = $this->opencon();
+            $query = ("SELECT product.name, COUNT(purchased.product_id) AS MostBoughtProduct
+FROM purchased
+INNER JOIN product ON purchased.product_id = product.product_id
+GROUP BY product.name
+ORDER BY MostBoughtProduct DESC");
+            $result = $con->query($query);
+            return $result->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return []; // Return an empty array in case of error
+        }
+    }
 }

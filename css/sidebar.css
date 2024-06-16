@@ -1,66 +1,65 @@
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 10%; /* Adjust as needed */
+  margin-top: 0px;
+  background-color: #343a40; /* Adjust background color */
+  padding: 5px; /* Adjust padding */
+}
+
+
+.sidebar .nav-link {
+  color: #ffffff; /* Adjust link color */
+}
+
+.sidebar .nav-item.active .nav-link {
+  font-weight: bold; /* Adjust active link font weight */
+}
+
+.sidebar .navbar-nav {
+  margin-top: 20px; /* Adjust margin between top and first link */
+}
+
+.sidebar .navbar-nav .nav-item {
+  margin-bottom: 10px; /* Adjust margin between each link */
+}
+
+.sidebar .navbar-toggler {
+  display: none; /* Hide toggler in sidebar */
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    width: 100%; /* Make sidebar full width on smaller screens */
+    padding: 20px 10px; /* Adjust padding */
+    z-index: 1000; /* Ensure sidebar is above other content */
+  }
+
+  .sidebar .navbar-collapse {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    width: 10%; /* Adjust as needed */
-    margin-top: 50px;
-    background-color: #343a40; /* Adjust background color */
-    padding: 5px; /* Adjust padding */
+    width: 100%;
+    background-color: #0040DD; /* Adjust background color */
+    padding-top: 70px; /* Adjust padding top */
+    padding-left: 10px; /* Adjust padding left */
+    padding-right: 10px; /* Adjust padding right */
+    overflow-y: auto; /* Enable vertical scrolling */
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
   }
-  
-  
-  .sidebar .nav-link {
-    color: #ffffff; /* Adjust link color */
+
+  .sidebar.show .navbar-collapse {
+    transform: translateX(0);
   }
-  
-  .sidebar .nav-item.active .nav-link {
-    font-weight: bold; /* Adjust active link font weight */
-  }
-  
-  .sidebar .navbar-nav {
-    margin-top: 20px; /* Adjust margin between top and first link */
-  }
-  
-  .sidebar .navbar-nav .nav-item {
-    margin-bottom: 10px; /* Adjust margin between each link */
-  }
-  
+
   .sidebar .navbar-toggler {
-    display: none; /* Hide toggler in sidebar */
+    display: block; /* Display toggler on smaller screens */
+    position: absolute;
+    top: 10px;
+    right: 10px;
   }
-  
-  @media (max-width: 991.98px) {
-    .sidebar {
-      width: 100%; /* Make sidebar full width on smaller screens */
-      padding: 20px 10px; /* Adjust padding */
-      z-index: 1000; /* Ensure sidebar is above other content */
-    }
-  
-    .sidebar .navbar-collapse {
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background-color: #0040DD; /* Adjust background color */
-      padding-top: 70px; /* Adjust padding top */
-      padding-left: 10px; /* Adjust padding left */
-      padding-right: 10px; /* Adjust padding right */
-      overflow-y: auto; /* Enable vertical scrolling */
-      transition: transform 0.3s ease;
-      transform: translateX(-100%);
-    }
-  
-    .sidebar.show .navbar-collapse {
-      transform: translateX(0);
-    }
-  
-    .sidebar .navbar-toggler {
-      display: block; /* Display toggler on smaller screens */
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-  }
-  
+}

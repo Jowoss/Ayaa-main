@@ -1,25 +1,4 @@
-<?php
-require_once('classes/database.php');
-$con = new database();
- 
-session_start();
 
-
-if (empty($_SESSION['user'])){
-  header('location:login.php');                                                                                                                                                 
- }
-
-if(isset($_POST['home'])){
-    $user_id = $_POST['id'];
-    if($con->delete($admin_id)){
-        header('location:home.php');
-} else {
-    echo 'Something went wrong';
-}
-}
-
-
-?>
  
 <!DOCTYPE html>
 <html lang="en">
@@ -36,64 +15,73 @@ if(isset($_POST['home'])){
 </head>
 <body>
 
-<?php include('navbar.php');?>
 
-<div class="container user-info rounded shadow p-3 my-2">
-<h2 class="text-center mb-2">Admin Table</h2>
-  <div class="table-responsive text-center">
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Profile</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Username</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-      <?php
-      $counter = 1;
-      // $id = $_SESSION['id'];
-      $data = $con->view();
-      foreach($data as $row) {
-        ?>
-         <tr>
-          <td><?php echo $counter++;?></td>
-          <td>
-          <?php if (!empty($row['profile_picture'])): ?>
-          <img src="<?php echo htmlspecialchars($row['profile_picture']); ?>" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%;">
-        <?php else: ?>
-          <img src="path/to/default/profile/pic.jpg" alt="Default Profile Picture" style="width: 50px; height: 50px; border-radius: 50%;">
-        <?php endif; ?>
-      </td>
-          <td><?php echo $row['firstname'];?></td>
-          <td><?php echo $row['lastname'];?></td>
-          <td><?php echo $row['user'];?></td>
-          <td>
- 
-        <!-- Edit button -->
-          <form action="update.php" method="POST" style="display: inline;">
-            <input type="hidden" name="id" value="<?php echo $row['admin_id']; ?>">
-            <button type="submit"  name="edit" class="btn btn-primary btn-sm">Edit</button>
-          </form>
-        <!-- Delete button -->
-        <form method="POST" style="display: inline;">
-            <input type="hidden" name="id" value="<?php echo $row['admin_id']; ?>">
-            <input type="submit"  name="del" value="Delete" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">
-        </form>
-          </td>
-        </tr>
-        <?php
-      }
-      ?>
- 
-      </tbody>
-    </table>
-  </div>
-</div>
-</div>
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Total Sales </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Total Income</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Total Income</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                        </div>
+                                        <div class="col-auto">
+                                              <i class="fas fa-people-group"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
  
 <!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

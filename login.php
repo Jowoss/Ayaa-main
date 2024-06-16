@@ -10,18 +10,19 @@ if(isset($_POST['login'])){
   $result = $con->check($username,$password);
 
   if($result){
-    if($result['user'] == $_POST['user'] && $result['pass'] == $_POST['pass']){
+    // Use password_verify to check the hashed password
+    if(password_verify($password, $result['pass'])) {
       $_SESSION['user'] = $result['user'];
       $_SESSION['admin_id'] = $result['admin_id'];
-      header('location:product.php');
+      header('location: product.php');
+      exit;
     } else {
       echo 'Incorrect username or password. Please try again.';
     }
-   } else {
-      echo 'Error occured while logging in. Please try again.';
-    }
-    }
-
+  } else {
+    echo 'Error occurred while logging in. Please try again.';
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,55 +33,52 @@ if(isset($_POST['login'])){
   <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.css">
   <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="./css/login.css">
+  <link rel="stylesheet" href="./css/login.css">
   <style>
-  
+
   </style>
 </head>
 <body>
 <div class="container">
-        <h1>Aya Store Inventory System</h1>
-<div class="container-fluid login-container rounded shadow">
-  <h2 class="text-center login-heading mb-2">Login</h2>
-  
-  <form method="post">
-    <div class="form-group">
-      <!-- <label for="username">Username:</label> -->
-      <input type="text" class="form-control <?php if (!empty($error)) echo 'error-input'; ?>" name="user" placeholder="Enter username">
-    </div>
-    <div class="form-group">
-      <!-- <label for="password">Password:</label> -->
-      <input type="password" class="form-control <?php if (!empty($error)) echo 'error-input'; ?>" name="pass" placeholder="Enter password">
-    </div>
-    <?php if (!empty($error)) : ?>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <?php echo $error; ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        <?php endif; ?>
+  <h1>Aya Store Inventory System</h1>
+  <div class="container-fluid login-container rounded shadow">
+    <h2 class="text-center login-heading mb-2">Login</h2>
 
-                        <div class="container1">
-                          <div class="row gx-1">
-                            <div class="col">
-                            <input type="submit" class="btn btn-primary btn-block" value="Log In" name="login">
-                            </div>
-                            <div class="col">
-                            <a type="submit" class="btn btn-danger btn-block" href="signup.php">Sign Up</a>
-                            </div>
-                          </div>
-                        </div>
-    </div>
-   
-   
-  </form>
-</div>
- 
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
-<!-- Bootsrap JS na nagpapagana ng danger alert natin -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <form method="post">
+      <div class="form-group">
+        <!-- <label for="username">Username:</label> -->
+        <input type="text" class="form-control <?php if (!empty($error)) echo 'error-input'; ?>" name="user" placeholder="Enter username">
+      </div>
+      <div class="form-group">
+        <!-- <label for="password">Password:</label> -->
+        <input type="password" class="form-control <?php if (!empty($error)) echo 'error-input'; ?>" name="pass" placeholder="Enter password">
+      </div>
+      <?php if (!empty($error)) : ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <?php echo $error; ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <?php endif; ?>
+
+      <div class="container1">
+        <div class="row gx-1">
+          <div class="col">
+            <input type="submit" class="btn btn-primary btn-block" value="Log In" name="login">
+          </div>
+          <div class="col">
+            <a type="submit" class="btn btn-danger btn-block" href="signup.php">Sign Up</a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
+  <!-- Bootsrap JS na nagpapagana ng danger alert natin -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

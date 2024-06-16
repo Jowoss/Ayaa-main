@@ -1,28 +1,98 @@
 <?php
 require_once('classes/database.php');
 $con = new database();
- 
-// session_start();
+$html = ''; // Initialize empty variable for product table content
 
-
-// if (empty($_SESSION['admin_id'])){
-//   header('location:product.php');                                                                                                                                                 
-//  }
-
- if(isset($_POST['product'])){
+// Handle product deletion
+if(isset($_POST['product'])){
     $product_id = $_POST['id'];
     if($con->deletePro($product_id)){
         header('location:product.php');
+        exit;
     } else {
         echo 'Something went wrong';
     }
-
 }
 
+try {
+    $connection = $con->opencon();
+
+    // Check for connection error
+    if (!$connection) {
+        echo json_encode(['error' => 'Database connection failed.']);
+        exit;
+    }
+
+    // Define the number of records per page
+    $recordsPerPage = 6;
+
+    // Get the current page number from the request, default to 1 if not set
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $offset = ($currentPage - 1) * $recordsPerPage;
+
+    // Get the total number of records
+    $totalQuery = $connection->prepare("SELECT COUNT(*) AS total FROM product");
+    $totalQuery->execute();
+    $totalRecords = $totalQuery->fetch(PDO::FETCH_ASSOC)['total'];
+    $totalPages = ceil($totalRecords / $recordsPerPage);
+
+    // Fetch products for the current page
+    $query = $connection->prepare("SELECT product.product_id, product.name, product.stock, product.price, product.expiration_date, category.type, product.picture
+                                   FROM product
+                                   INNER JOIN category ON product.category_id = category.category_id
+                                   LIMIT :offset, :recordsPerPage");
+    $query->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $query->bindParam(':recordsPerPage', $recordsPerPage, PDO::PARAM_INT);
+    $query->execute();
+    $products = $query->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($products as $product) {
+        $html .= '<tr>';
+        $html .= '<td>' . $product['product_id'] . '</td>';
+        $html .= '<td><img src="' . htmlspecialchars($product['picture']) . '" alt="Product Picture" style="width: 50px; height: 50px; border-radius: 50%;"></td>';
+        $html .= '<td>' . $product['name'] . '</td>';
+        $html .= '<td>' . $product['type'] . '</td>';
+        $html .= '<td>' . $product['stock'] . '</td>';
+        $html .= '<td>' . $product['price'] . '</td>';
+        $html .= '<td>' . $product['expiration_date'] . '</td>';
+        $html .= '<td>'; // Action column
+        $html .= '<form action="updateproduct.php" method="post" style="display: inline;">';
+        $html .= '<input type="hidden" name="id" value="' . $product['product_id'] . '">';
+        
+        $html .= '<button type="submit" class="btn btn-primary btn-sm">Edit</button>';
+        $html .= '</form>';
+        $html .= '<form method="POST" style="display: inline;">';
+        $html .= '<input type="hidden" name="id" value="' . $product['product_id'] . '">';
+        $html .= '<input type="submit" name="product" class="btn btn-danger btn-sm" value="Delete" onclick="return confirm(\'Are you sure you want to delete this product?\')">';
+        $html .= '</form>';
+        $html .= '</td>';
+        $html .= '</tr>';
+    }
+
+    // Output the pagination HTML
+    $paginationHtml = '';
+    if ($totalPages > 1) {
+        $paginationHtml .= '<nav><ul class="pagination justify-content-center">';
+        if ($currentPage > 1) {
+            $paginationHtml .= '<li class="page-item"><a class="page-link" href="?page=' . ($currentPage - 1) . '">Previous</a></li>';
+        }
+        for ($i = 1; $i <= $totalPages; $i++) {
+            $active = $i == $currentPage ? ' active' : '';
+            $paginationHtml .= '<li class="page-item' . $active . '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+        }
+        if ($currentPage < $totalPages) {
+            $paginationHtml .= '<li class="page-item"><a class="page-link" href="?page=' . ($currentPage + 1) . '">Next</a></li>';
+        }
+        $paginationHtml .= '</ul></nav>';
+    }
+
+} catch (PDOException $e) {
+    echo json_encode(['error' => $e->getMessage()]);
+}
 
 ?>
  
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -46,6 +116,7 @@ $con = new database();
     <h2 class="text-center mb-2">Product Table</h2>
     <div class="table-responsive text-center">
         <table class="table table-bordered">
+        <i class='bx bx-edit'></i>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -59,45 +130,11 @@ $con = new database();
                 </tr>
             </thead>
             <tbody>
-            <?php
-                $counter = 1;
-                $data = $con->getProductData();
-                foreach($data as $row) {
-                ?>
-                <tr>
-                    <td><?php echo $counter++;?></td>
-                    <td>
-                        <?php if (!empty($row['picture'])): ?>
-                        <img src="<?php echo htmlspecialchars($row['picture']); ?>" alt="productPicture" style="width: 50px; height: 50px; border-radius: 50%;">
-                        <?php else: ?>
-                        <img src="path/to/default/profile/pic.jpg" alt="Default productPicture" style="width: 50px; height: 50px; border-radius: 50%;">
-                        <?php endif; ?>
-                    </td>
-                    <td><?php echo $row['name'];?></td>
-                    <td><?php echo $row['type'];?></td>
-                    <td><?php echo $row['stock'];?></td>
-                    <td><?php echo $row['price'];?></td>
-                    <td><?php echo $row['expiration_date']; ?>
-                  </td>
-                    <td>
-                        <!-- Edit button -->
-                        <form action="updateproduct.php" method="POST" style="display: inline;">
-                            <input type="hidden" name="id" value="<?php echo $row['product_id']; ?>">
-                            <button type="submit"  name="edit" class="btn btn-primary btn-sm">Edit</button>
-                        </form>
-                        <!-- Delete button -->
-                        <form method="POST" style="display: inline;">
-                            <input type="hidden" name="id" value="<?php echo $row['product_id']; ?>">
-                            <input type="submit"  name="product" value="Delete" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?')">
-                        </form>
-                    </td>
-                </tr>
-                <?php
-                }
-                ?>
+                <?php echo $html; ?>
             </tbody>
         </table>
     </div>
+    <?php echo $paginationHtml; ?>
     
     <!-- Button for adding product -->
     <div class="text-center mt-3">
@@ -106,7 +143,6 @@ $con = new database();
 </div>
 
 
- 
 <!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
