@@ -19,7 +19,18 @@ $con = new database();
     <!-- Custom CSS -->
     <link rel="stylesheet" href="dashboard.css">
 </head>
+
 <body>
+<?php
+$page = isset($_GET['page']) ? $_GET['page'] : 1; // Get current page number from query string
+$recordsPerPage = 5; // Number of records to display per page
+
+$startFrom = ($page - 1) * $recordsPerPage; // Calculate the starting point for fetching records
+
+$salesData = $con->getSalesPerformanceDataPaginated($startFrom, $recordsPerPage); // Modify this method in your database class
+
+?>
+    
 
 <?php include('sidebar.php'); ?>
     
@@ -31,37 +42,44 @@ $con = new database();
                 <p>₱ <span id="total-sales"><?php echo $con->getTotalSales(); ?></span></p>
             </div>
             <div class="summary-item">
-                <h2>Monthly Income</h2>
-                <p>₱ <span id="total-income"><?php echo $con->getMonthlyIncome(); ?></span></p>
-            </div>
-            <div class="summary-item">
                 <h2>Total Customers</h2>
                 <p><span id="total-customers"><?php echo $con->getTotalCustomers(); ?></span></p>
             </div>
         </div>
+
         <div class="table-container">
-            <h2>Sales Performance Table</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Sales</th>
-                    </tr>
-                </thead>
-                <tbody id="sales-performance">
-                <?php
-                    // PHP code for populating sales performance table dynamically
-                    $salesData = $con->getSalesPerformanceData(); // Assuming a method to fetch sales performance data from the database
-                    foreach ($salesData as $row) {
-                        echo '<tr>';
-                        echo '<td>' . $row['date_purchase'] . '</td>';
-                        echo '<td>₱ ' . number_format($row['payment_totalamount'], 2) . '</td>';
-                        echo '</tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
+    <h2>Sales Performance Table</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Sales</th>
+            </tr>
+        </thead>
+        <tbody id="sales-performance">
+            <?php
+            // PHP code for populating sales performance table dynamically with pagination
+            $salesData = $con->getSalesPerformanceDataPaginated($startFrom, $recordsPerPage); // Fetch data based on current page
+            foreach ($salesData as $row) {
+                echo '<tr>';
+                echo '<td>' . $row['date_purchase'] . '</td>';
+                echo '<td>₱ ' . number_format($row['payment_totalamount'], 2) . '</td>';
+                echo '</tr>';
+            }
+            ?>
+        </tbody>
+    </table>
+    <!-- Pagination links -->
+    <ul class="pagination">
+        <?php
+        // Generate pagination links dynamically
+        $totalPages = ceil($con->countTotalSales() / $recordsPerPage); // Assuming a method to count total records
+        for ($i = 1; $i <= $totalPages; $i++) {
+            echo '<li class="page-item ' . ($page == $i ? 'active' : '') . '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+        }
+        ?>
+    </ul>
+</div>
         <div class="table-container">
             <h2>Popular Product</h2>
             <table>

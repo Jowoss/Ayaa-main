@@ -301,7 +301,17 @@ function fetchSelectedProducts($selectedProductIds) {
     }
 
     function getTotalCustomers(){
-        // Implement this method to fetch total customers if needed
+        try {
+            $con = $this->opencon();
+            $query = $con->prepare("SELECT COUNT(payment.payment_id) AS TotalCustomer FROM Payment");
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            return $result['TotalCustomer']; // Return the total sales amount
+        } catch (PDOException $e) {
+            // Handle the exception (e.g., log error, return false, etc.)
+            return 0; // Return 0 or handle as needed
+        }
+         
     }
 
     function getSalesPerformanceData() {
@@ -319,11 +329,8 @@ function fetchSelectedProducts($selectedProductIds) {
     function getmostboughtproduct(){
         try {
             $con = $this->opencon();
-            $query = ("SELECT product.name, COUNT(purchased.product_id) AS MostBoughtProduct
-FROM purchased
-INNER JOIN product ON purchased.product_id = product.product_id
-GROUP BY product.name
-ORDER BY MostBoughtProduct DESC");
+            $query = ("SELECT product.name, COUNT(purchased.product_id) AS MostBoughtProduct FROM purchased INNER JOIN product ON purchased.product_id = product.product_id GROUP BY product.name
+ORDER BY MostBoughtProduct DESC LIMIT 3");
             $result = $con->query($query);
             return $result->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -331,4 +338,34 @@ ORDER BY MostBoughtProduct DESC");
             return []; // Return an empty array in case of error
         }
     }
+
+    public function getSalesPerformanceDataPaginated($startFrom, $recordsPerPage) {
+        try {
+            $con = $this->opencon();
+            $query = "SELECT date_purchase, payment_totalamount FROM payment ORDER BY date_purchase DESC LIMIT :startFrom, :recordsPerPage";
+            $stmt = $con->prepare($query);
+            $stmt->bindParam(':startFrom', $startFrom, PDO::PARAM_INT);
+            $stmt->bindParam(':recordsPerPage', $recordsPerPage, PDO::PARAM_INT);
+            $stmt->execute();
+            $salesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $salesData;
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return []; // Return an empty array in case of error
+        }
+    }
+
+    public function countTotalSales() {
+        try {
+            $con = $this->opencon();
+            $query = $con->prepare("SELECT COUNT(*) AS total_sales FROM payment");
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            return $result['total_sales'];
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return 0; // Return 0 or handle as needed
+        }
+    }
+
 }
