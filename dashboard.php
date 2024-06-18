@@ -81,12 +81,12 @@ $salesData = $con->getSalesPerformanceDataPaginated($startFrom, $recordsPerPage)
     </ul>
 </div>
         <div class="table-container">
-            <h2>Popular Product</h2>
+            <h2>Popular Products</h2>
             <table>
                 <thead>
                     <tr>
                         <th>Product Name</th>
-                        <th>Most Bought Product</th>
+                        <th>Most Bought Products</th>
                     </tr>
                 </thead>
                 <tbody id="popular-product">

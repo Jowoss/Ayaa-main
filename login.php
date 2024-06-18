@@ -14,7 +14,7 @@ if(isset($_POST['login'])){
     if(password_verify($password, $result['pass'])) {
       $_SESSION['user'] = $result['user'];
       $_SESSION['admin_id'] = $result['admin_id'];
-      header('location: product.php');
+      header('location: dashboard.php');
       exit;
     } else {
       echo 'Incorrect username or password. Please try again.';
